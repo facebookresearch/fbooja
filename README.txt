@@ -35,3 +35,13 @@ include admm2.py and radialines.py, which are similarly useful only for
 experimentation. Radially retained sampling patterns used in clinical practice
 do not fall on Cartesian grids. The "2" versions give a proof of principle,
 nothing more.
+
+
+********************************************************************************
+
+
+brains.sh is a bash script that generates all figures in the paper available at
+http://tygert.com/comps.pdf
+
+brains.sh processes the scans of brains in the subdirectory "brains" and saves
+the results to a new subdirectory, "brainsout".
