@@ -386,7 +386,7 @@ def cs_fft(m, n, f, mask, mu, beta, n_iter):
         assert f.shape[1] == n
         assert mask[0]
         # Convert the mask from booleans to long integers.
-        mask_nnz = torch.nonzero(mask).squeeze(1)
+        mask_nnz = torch.nonzero(mask, as_tuple=False).squeeze(1)
         # Rescale f and pad with zeros between the mask samples.
         Ktf = zero_padded(m, n, f, mask_nnz) * (mu / beta)
         # Calculate the Fourier transform of the convolutional kernels

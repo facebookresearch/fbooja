@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import hsv_to_rgb
 from PIL import Image
 import torch
-import skimage
+import skimage.filters
 
 import ctorch
 import admm
@@ -192,29 +192,29 @@ def bootstrap(filein, fileout, subsampling_factor, mask, low, recon,
     # Plot the original.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Original')
-    plt.imshow(f_orig, **kwargs01)
+    plt.imshow(np.clip(f_orig, 0, 1), **kwargs01)
     plt.savefig(rest + '_original' + suffix, bbox_inches='tight')
     # Plot the reconstruction from the original mask provided.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Reconstruction')
-    plt.imshow(reconf, **kwargs01)
+    plt.imshow(np.clip(reconf, 0, 1), **kwargs01)
     plt.savefig(rest + '_recon' + suffix, bbox_inches='tight')
     # Plot the difference from the original.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Error of Reconstruction')
-    plt.imshow(reconf - f_orig, **kwargs11)
+    plt.imshow(np.clip(reconf - f_orig, -1, 1), **kwargs11)
     plt.savefig(rest + '_error' + suffix, bbox_inches='tight')
     # Plot thrice the average of the bootstrap differences.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Bootstrap')
-    plt.imshow(scaled, **kwargs11)
+    plt.imshow(np.clip(scaled, -1, 1), **kwargs11)
     plt.savefig(rest + '_bootstrap' + suffix, bbox_inches='tight')
 
     if viz:
         # Plot the reconstruction minus the bootstrap difference.
         plt.figure(figsize=(5.5, 5.5))
         plt.title('Reconstruction \u2013 Bootstrap')
-        plt.imshow(reconf - scaled, **kwargs01)
+        plt.imshow(np.clip(reconf - scaled, 0, 1), **kwargs01)
         plt.savefig(rest + '_corrected' + suffix, bbox_inches='tight')
         # Overlay the error estimates on the reconstruction.
         plt.figure(figsize=(5.5, 5.5))
@@ -228,7 +228,7 @@ def bootstrap(filein, fileout, subsampling_factor, mask, low, recon,
         hsv = np.dstack((hue, saturation, value))
         rgb = hsv_to_rgb(hsv)
         plt.title('Errors Over a Threshold Overlaid')
-        plt.imshow(rgb)
+        plt.imshow(np.clip(rgb, 0, 1))
         plt.savefig(rest + '_overlaid' + suffix, bbox_inches='tight')
         # Overlay the blurred error estimates on the reconstruction.
         plt.figure(figsize=(5.5, 5.5))
@@ -242,7 +242,7 @@ def bootstrap(filein, fileout, subsampling_factor, mask, low, recon,
         hsv = np.dstack((hue, saturation, value))
         rgb = hsv_to_rgb(hsv)
         plt.title('Blurred Errors Over a Threshold Overlaid')
-        plt.imshow(rgb)
+        plt.imshow(np.clip(rgb, 0, 1))
         plt.savefig(rest + '_blurred_overlaid' + suffix, bbox_inches='tight')
         # Plot a bootstrap-saturated reconstruction.
         plt.figure(figsize=(5.5, 5.5))
@@ -253,7 +253,7 @@ def bootstrap(filein, fileout, subsampling_factor, mask, low, recon,
         hsv = np.dstack((hue, saturation, value))
         rgb = hsv_to_rgb(hsv)
         plt.title('Bootstrap-Saturated Reconstruction')
-        plt.imshow(rgb)
+        plt.imshow(np.clip(rgb, 0, 1))
         plt.savefig(rest + '_saturated' + suffix, bbox_inches='tight')
         # Plot a bootstrap-interpolated reconstruction.
         plt.figure(figsize=(5.5, 5.5))
@@ -264,12 +264,12 @@ def bootstrap(filein, fileout, subsampling_factor, mask, low, recon,
         hsv = np.dstack((hue, saturation, value))
         rgb = hsv_to_rgb(hsv)
         plt.title('Bootstrap-Interpolated Reconstruction')
-        plt.imshow(rgb)
+        plt.imshow(np.clip(rgb, 0, 1))
         plt.savefig(rest + '_interpolated' + suffix, bbox_inches='tight')
         # Plot the blurred bootstrap.
         plt.figure(figsize=(5.5, 5.5))
         plt.title('Blurred Bootstrap')
-        plt.imshow(blurred, **kwargs11)
+        plt.imshow(np.clip(blurred, -1, 1), **kwargs11)
         plt.savefig(rest + '_blurred' + suffix, bbox_inches='tight')
 
     return lossf, loss, rsse_estimated, rsse_blurred

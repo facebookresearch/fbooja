@@ -166,22 +166,22 @@ def jackknife2(filein, fileout, angles, low, recon, recon_args, sdn=None):
     # Plot the original.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Original')
-    plt.imshow(f_orig, **kwargs01)
+    plt.imshow(np.clip(f_orig, 0, 1), **kwargs01)
     plt.savefig(rest + '_original' + suffix, bbox_inches='tight')
     # Plot the reconstruction from the original mask provided.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Reconstruction')
-    plt.imshow(reconf, **kwargs01)
+    plt.imshow(np.clip(reconf, 0, 1), **kwargs01)
     plt.savefig(rest + '_recon' + suffix, bbox_inches='tight')
     # Plot the difference from the original.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Error of Reconstruction')
-    plt.imshow(reconf - f_orig, **kwargs11)
+    plt.imshow(np.clip(reconf - f_orig, -1, 1), **kwargs11)
     plt.savefig(rest + '_error' + suffix, bbox_inches='tight')
     # Plot twice the sum of the leave-one-out differences.
     plt.figure(figsize=(5.5, 5.5))
     plt.title('Jackknife')
-    plt.imshow(scaled, **kwargs11)
+    plt.imshow(np.clip(scaled, -1, 1), **kwargs11)
     plt.savefig(rest + '_jackknife' + suffix, bbox_inches='tight')
 
     return lossf, loss

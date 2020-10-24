@@ -392,7 +392,8 @@ def cs_fft(m, n, f, mask, mu, beta, n_iter):
     elif isinstance(f, ctorch.ComplexTensor):
         assert mask[0, 0]
         # Convert the mask from boolean indicators to long integer indices.
-        mask_nnz = torch.nonzero(torch.from_numpy(mask.astype(np.uint8)))
+        mask_nnz = torch.nonzero(torch.from_numpy(mask.astype(np.uint8)),
+                                 as_tuple=False)
         mask_nnz = mask_nnz.cuda()
         # Rescale f and pad with zeros between the mask samples.
         Ktf = zero_padded(m, n, f, mask_nnz) * (mu / beta)

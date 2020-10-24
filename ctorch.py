@@ -177,7 +177,9 @@ def norm(X, **kwargs):
 def from_numpy(x):
     """Creates a ComplexTensor from a numpy.ndarray.
     """
-    return ComplexTensor(torch.from_numpy(x.real), torch.from_numpy(x.imag))
+    a = x.real.copy()
+    b = x.imag.copy()
+    return ComplexTensor(torch.from_numpy(a), torch.from_numpy(b))
 
 
 # FFT
