@@ -92,6 +92,7 @@ def randradialineset(m, n, angles):
 
 
 if __name__ == '__main__':
+    np.random.seed(seed=1337)
     plt.figure(figsize=(24, 6))
     for m in [80, 81]:
         for n in [60, 61]:
