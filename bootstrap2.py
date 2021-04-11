@@ -123,7 +123,7 @@ def bootstrap2(filein, fileout, subsampling_factor, angles, low, recon,
     ff_noisy = ff_orig.copy()
     ff_noisy += sdn * (np.random.randn(m, n) + 1j * np.random.randn(m, n))
     # Select which frequencies to retain.
-    mask = radialines.randradialines(m, n, angles)
+    mask = radialines.randradialineset(m, n, angles)
     # Include all low frequencies.
     for km in range(low):
         for kn in range(low):
@@ -148,7 +148,7 @@ def bootstrap2(filein, fileout, subsampling_factor, angles, low, recon,
         angles1 = np.random.uniform(
             low=0, high=(2 * np.pi),
             size=round(2 * (m + n) * subsampling_factor))
-        mask1 = radialines.randradialines(m, n, angles1)
+        mask1 = radialines.randradialineset(m, n, angles1)
         # Include all low frequencies.
         for km in range(low):
             for kn in range(low):

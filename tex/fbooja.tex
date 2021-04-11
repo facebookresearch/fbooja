@@ -1,55 +1,65 @@
-% SIAM Article Template
-\documentclass[review,onefignum,onetabnum,juq]{siamonline181217}
+%%
+%% Copyright (c) Facebook, Inc. and its affiliates.
+%%
+%% This source code is licensed under the MIT license found in the LICENSE file
+%% in the root directory of this source tree.
+%%
 
-% Information that is shared between the article and the supplement
-% (title and author information, macros, packages, etc.) goes into
-% ex_shared.tex. If there is no supplement, this file can be included
-% directly.
 
-\input{shared}
+\documentclass[article]{jdssv}
 
-% Optional PDF information
-\ifpdf
-\hypersetup{
-  pdftitle={Compressed sensing with a jackknife and a bootstrap},
-  pdfauthor={Aaron Defazio, Mark Tygert, Rachel Ward, and Jure Zbontar}
-}
-\fi
+%% -- LaTeX packages and custom commands ---------------------------------------
 
-% The next statement enables references to information in the
-% supplement. See the xr-hyperref package for details.
+%% recommended packages
+\usepackage{lmodern}
 
-\externaldocument{fboojas}
+%% other packages
+\usepackage{amsmath,amsthm}
 
-% FundRef data to be entered by SIAM
-%<funding-group specific-use="FundRef">
-%<award-group>
-%<funding-source>
-%<named-content content-type="funder-name"> 
-%</named-content> 
-%<named-content content-type="funder-identifier"> 
-%</named-content>
-%</funding-source>
-%<award-id> </award-id>
-%</award-group>
-%</funding-group>
+\newtheorem{theorem}{Theorem}[]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{observe}[theorem]{Observation}
+\newtheorem{remark1}[theorem]{Remark}
+\newenvironment{remark}{\begin{remark1} \rm}{\end{remark1}}
 
-\begin{document}
+\extrafloats{128}
+\maxdeadcycles=200
 
-\maketitle
 
-% REQUIRED
-\begin{abstract}
+%% -- Article metainformation (author, title, ...) -----------------------------
+
+%% - \author{} with primary affiliation
+%% - \Plainauthor{} without affiliations
+%% - Separate authors by \And or \AND (in \author) or by comma (in \Plainauthor).
+%% - \AND starts a new line, \And does not.
+\author{Aaron Defazio\\Facebook Artificial Intelligence Research \And
+        Mark Tygert\\Facebook AI Research \AND
+        Rachel Ward\\University of Texas at Austin \And
+        Jure Zbontar\\Facebook AI Research}
+\Plainauthor{Aaron Defazio, Mark Tygert, Rachel Ward, Jure Zbontar}
+
+%% - \title{} in title case
+%% - \Plaintitle{} without LaTeX markup (if any)
+%% - \Shorttitle{} with LaTeX markup (if any), used as running title
+\title{Compressed Sensing with a Jackknife and a Bootstrap}
+\Plaintitle{Compressed Sensing with a Jackknife and a Bootstrap}
+\Shorttitle{Compressed Sensing with a Jackknife and a Bootstrap}
+
+%% - \Abstract{} almost as usual
+\Abstract{
 Compressed sensing proposes to reconstruct more degrees of freedom in a signal
-than the number of values actually measured.
+than the number of values actually measured
+(based on a potentially unjustified regularizer or prior distribution).
 Compressed sensing therefore risks introducing errors ---
 inserting spurious artifacts or masking the abnormalities that
 medical imaging seeks to discover.
 Estimating errors using the standard statistical tools
 of a jackknife and a bootstrap yields error ``bars'' in the form
-of full images that are remarkably representative of the actual errors
-(at least when evaluated and validated on data sets for which the ground truth
-and hence the actual error is available).
+of full images that are remarkably qualitatively representative
+of the actual errors (at least when evaluated and validated on data sets
+for which the ground truth and hence the actual error is available).
 These images show the structure of possible errors --- without recourse
 to measuring the entire ground truth directly --- and build confidence
 in regions of the images where the estimated errors are small.
@@ -70,28 +80,54 @@ and the root-mean-square improves greatly after mild blurring
 of the error estimates; the blurring is barely perceptible to the human eye
 yet smooths away background noise that would otherwise overwhelm
 the root-mean-square.
-\end{abstract}
+}
 
-% REQUIRED
-\begin{keywords}
-error estimation, visualization, medical imaging, magnetic resonance imaging,
-compressive sensing, compressive sampling
-\end{keywords}
+%% - \Keywords{} with LaTeX markup, at least one required
+%% - \Plainkeywords{} without LaTeX markup (if necessary)
+%% - Should be comma-separated and in sentence case.
+\Keywords{error estimation, visualization, medical imaging,
+magnetic resonance imaging, compressive sensing, compressive sampling}
+\Plainkeywords{error estimation, visualization, medical imaging,
+magnetic resonance imaging, compressive sensing, compressive sampling}
 
-% REQUIRED
-\begin{AMS}
-62F40, 62-09, 65C60, 00A66
-\end{AMS}
+%% - \Address{} of at least one author
+%% - May contain multiple affiliations for each author
+%%   (in extra lines, separated by \emph{and}\\).
+%% - May contain multiple authors for the same affiliation
+%%   (in the same first line, separated by comma).
+\Address{
+  Mark Tygert\\
+  Facebook Artificial Intelligence Research\\
+  1 Facebook Way\\
+  Menlo Park, CA 94025\\
+  E-mail: \email{mark@tygert.com}\\
+  URL: \url{http://tygert.com}\\
+\ \\
+}
+
+\begin{document}
 
 
+%% -- Introduction -------------------------------------------------------------
 
+%% - In principle "as usual".
+%% - But should typically have some discussion of both _software_ and _methods_.
+%% - Use \proglang{}, \pkg{}, and \code{} markup throughout the manuscript.
+%% - If such markup is in (sub)section titles, a plain text version has to be
+%%   added as well.
+%% - All software mentioned should be properly \cite-d.
+%% - All abbreviations should be introduced.
+%% - Unless the expansions of abbreviations are proper names (like "Journal
+%%   of Statistical Software" above) they should be in sentence case (like
+%%   "generalized linear models" below).
 
 \section{Introduction}
 
 Compressed sensing is the concept that many interesting signals are recoverable
 from undersampled measurements of the representations of those signals
 in a special basis. A widely touted potential application
-is to the acceleration of magnetic resonance imaging (MRI).
+is to the acceleration of magnetic resonance imaging (MRI),
+as by~\citet{lustig-donoho-pauly}.
 In MRI, the special basis for representations of signals is the Fourier basis,
 and the goal of compressed sensing is to recover high-resolution images
 from relatively sparse measurements of the Fourier components of those images.
@@ -100,23 +136,26 @@ in the Fourier domain than the numbers of pixels in the reconstructed images.
 Of course, recovering more degrees of freedom than the number of measured
 values is an ill-posed problem, yet has been rigorously proven to be solvable
 when the gradients of the images being recovered are known to be small
-except at a few pixels, for instance, when edges dominate the images.
+except at a few pixels, for instance, when edges dominate the images
+(the proofs of~\citet{candes-romberg-tao} are especially well-known).
 This recovery is still non-trivial,
 as the small number of pixels where the gradients are non-trivial
 very well may vary from image to image, while the same reconstruction procedure
 works irrespective of where the gradients concentrate (so long as they
 concentrate on sparse subsets of all pixels in the reconstructed domain).
 The requirement that gradients be concentrated on sparse subsets
-is sufficient but may not be necessary, and much recent research aims
+is sufficient but may not be necessary, and much recent research
+--- including that
+of~\citet{hammernik-klatzer-kobler-recht-sodickson-pock-knoll} --- aims
 to generalize beyond this requirement by applying machine learning
 to representative data sets. Indeed, the literature on compressed sensing
 is vast and growing rapidly; see, for example,
-the recent review of~\cite{tropp} for explication of all this and more.
+the recent review of~\citet{tropp} for explication of all this and more.
 
 Needless to say, compressed sensing risks introducing errors
 into the resulting reconstructions, especially if the assumption of sparsity
 is unfounded for the real data at hand. The works
-of~\cite{malioutov-sanghavi-willsky} and~\cite{ward}
+of~\citet{malioutov-sanghavi-willsky} and~\citet{ward}
 quantify these errors via a single scalar estimate of confidence
 in the reconstruction, namely, an estimate of the mean-square error.
 The present paper extends these methods, producing estimates
@@ -130,7 +169,7 @@ and ``bootstrap'' estimates of the errors are reasonably representative
 of the reality, at least for the cases in MRI tested here,
 in which the ground truth is available for comparison and evaluation.
 Those unfamiliar with the jackknife and the bootstrap may wish
-to consult~\cite{efron-tibshirani};
+to consult~\citet{efron-tibshirani};
 that said, the presentation below is completely self-contained,
 not presuming any prior knowledge of either the jackknife or the bootstrap.
 The jackknife and bootstrap images highlight when, where, and what errors
@@ -192,9 +231,16 @@ for compressed sensing, together with methods for their visualization
 and automated summarization in scalar statistics.
 Then, Section~\ref{results} illustrates the performance of the methods
 on data sets from MRI, with copious additional examples provided
-in the supplementary materials.
+in the appendices.
 Finally, Section~\ref{conclusion} discusses the results introduced
 in Section~\ref{results} and draws some conclusions.
+
+The \proglang{Python} package \pkg{fbooja} reproduces all our results
+from Section~\ref{results} and the appendices and is available at
+\url{https://github.com/facebookresearch/fbooja}
+(that GitHub repository also includes a re-distribution
+of the MRI scans of a patient's head from the data
+of~\citet{mri2}, \citet{mri1}, \citet{mri3}, and~\citet{mri4}).
 
 
 
@@ -221,7 +267,9 @@ measurements to reconstruct the object in the original domain
 (hence involving an inverse Fourier transform to map from $X$ to $f(X, I)$).
 The reconstruction $f(X, S)$ from a subset $S$ of $I$ commonly involves
 minimizing a total-variation objective function or deep learning of some sort,
-as discussed by~\cite{tao-yang}, \cite{yang-zhang}, and their references.
+as discussed by~\citet{tao-yang}, \citet{yang-zhang},
+\citet{hammernik-klatzer-kobler-recht-sodickson-pock-knoll},
+and their references.
 
 With such undersampled measurements, the reconstruction is oblivious to much
 of the Fourier domain, sampling fewer measurements
@@ -293,7 +341,7 @@ f(\tilde{X}, I) = f(X, S).
 Then, we form the set $R$ of $\ell$ independent uniformly random draws from $I$
 (not all $\ell$ of which need be distinct),
 plus the fixed subset $T$ of $I$ (in so-called parallel MRI,
-as described by~\cite{brown-cheng-haacke-thompson-venkatesan},
+as described by~\citet{brown-cheng-haacke-thompson-venkatesan},
 $T$ would naturally contain all the lowest frequencies).
 We select a positive integer $k$ and repeat this resampling independently
 $k$ times, thus obtaining sets $R_1$, $R_2$, \dots, $R_k$.
@@ -358,7 +406,7 @@ whereas the medical meaning of such waves is often similar.
 We consider four methods for visualizing the effects of errors
 (estimated via the bootstrap) simultaneously with displaying
 the reconstruction, via manipulation of the hue-saturation-value color space
-described, for example, by~\cite{scikit-image}:
+described, for example, by~\citet{scikit-image}:
 %
 \begin{enumerate}
 \item ``Reconstruction -- Bootstrap'' is literally the bootstrap error estimate
@@ -441,24 +489,27 @@ To reconstruct an image from measurements taken in the Fourier domain
 of standard deviation $0.02\sqrt{2}$ added to mimic machine imprecision),
 we minimize the sum of deviations from the measurements
 plus a total-variation regularizer
-via Algorithm~1 at the end of Section~2.2 of~\cite{tao-yang}
-(which is based on the work of~\cite{yang-zhang}), with 100 iterations,
+via Algorithm~1 at the end of Section~2.2 of~\citet{tao-yang}
+(which is based on the work of~\citet{yang-zhang}), with 100 iterations,
 using the typical parameter settings $\mu = 10^{12}$ and $\beta = 10$
 ($\mu$ governs the fidelity to the measurements taken in the Fourier domain,
 and $\beta$ is the strength of the coupling in the operator splitting
 for the alternating-direction method of multipliers).
-As discussed by~\cite{tropp}, this is the canonical setting
+As discussed by~\citet{tropp}, this is the canonical setting
 for compressed sensing.
 All computations take place in IEEE standard double-precision arithmetic.
 We use $k =$ 1,000 resamplings for the bootstrap in~(\ref{difference}).
-The Python package ``fbooja'' reproduces our results and is available at
-http://github.com/facebookresearch/fbooja
+The \proglang{Python} package \pkg{fbooja} reproduces our results and
+is available at \url{https://github.com/facebookresearch/fbooja}
+\dots\ \pkg{fbooja} builds upon \proglang{PyTorch}
+of~\citet{pytorch}, which is available along with instructions for installation
+of dependencies at \url{https://pytorch.org}
 
 We consider two kinds of sampling patterns,
 radially retained and horizontally retained.
 All sampling takes place on an $m \times n$ Cartesian grid,
 allowing direct use of the fast Fourier transform
-for acceleration of the reconstruction (as described by~\cite{tao-yang}).
+for acceleration of the reconstruction (as described by~\citet{tao-yang}).
 Future implementations could consider sampling off the grid, too.
 
 With radially retained sampling,
@@ -495,15 +546,14 @@ just described chooses to include the index $i$.
 Figures~\ref{bigradial}--\ref{bighorizontal} display results for retaining
 radial and horizontal lines, using the same original images
 (the third and tenth --- ``lower'' and ``upper'' --- slices out of twenty).
-Further examples are available in Section~\ref{suppfigs}
-of the supplementary materials.
+Further examples are available in Appendix~\ref{suppfigs}.
 The figures whose captions specify ``$2\times$'' use
 $\frac{2(m + n)}{5}$ random angles for radially retained sampling
 and $\frac{m}{2}$ random integers for horizontally retained sampling
 instead of the $\frac{m + n}{5}$ random angles
 and $\frac{m}{4}$ random integers used in all other figures.
 All figures concern MRI scans of a patient's head from the data
-of~\cite{mri2}, \cite{mri1}, \cite{mri3}, and~\cite{mri4}.
+of~\citet{mri2}, \citet{mri1}, \citet{mri3}, and~\citet{mri4}.
 The resolutions in pixels of the original images range
 from $376 \times 286$ to $456 \times 371$.
 
@@ -526,13 +576,14 @@ extreme pure white and pure black correspond to more substantial errors.
 
 For the visualizations from Subsection~\ref{viz},
 we focus on two cross-sectional slices:
-the lower slice is the third of twenty in Section~\ref{suppfigs}
-of the supplementary materials, while the upper slice is the tenth.
+the lower slice is the third of twenty in Appendix~\ref{suppfigs},
+while the upper slice is the tenth.
 Figures~\ref{first_viz}--\ref{last_viz} display the visualizations
 from Subsection~\ref{viz}.
 Figures~\ref{blurredr} and~\ref{blurredh} depict the effects
 of the blur from Subsection~\ref{sum}, implemented
-with skimage.filters.gaussian from scikit-image of~\cite{scikit-image}.
+with \code{skimage.filters.gaussian}
+from \pkg{scikit-image} of~\citet{scikit-image}.
 Table~\ref{blurring} reports how drastically
 such a nearly imperceptible blur changes
 the square roots of the sums of the squares of the error estimates.
@@ -549,7 +600,7 @@ of the error estimates, while the last column of Table~\ref{blurs10} shows
 that denoising with wider Gaussian blurs brings diminishing returns.
 The width used in Table~\ref{blurring} and Figures~\ref{blurredr}
 and~\ref{blurredh} --- only one pixel --- may be safest.
-Section~\ref{blurredover} displays the grayscale reconstructions overlaid
+Appendix~\ref{blurredover} displays the grayscale reconstructions overlaid
 with the blurred bootstraps (blurring with a Gaussian whose standard deviation
 is one pixel), thresholded and colorized as in Subsection~\ref{viz}.
 
@@ -563,14 +614,14 @@ The jackknife images are generally noisier than the bootstrap images.
 The bootstrap directly explores parts of the Fourier domain
 outside the observed measurements, whereas the jackknife is more
 like a convergence test or a differential approximation to the bootstrap ---
-see, for example, the review of~\cite{efron-tibshirani}.
+see, for example, the review of~\citet{efron-tibshirani}.
 Both the jackknife and the bootstrap occasionally display artifacts
 where in fact the reconstruction was accurate.
 Moreover, they miss some anomalies;
 if the reconstruction completely washes out a feature of the original image,
 then neither the jackknife nor the bootstrap can detect the washed-out feature.
 That said, in most cases they show the actual errors nicely.
-The estimates bear an uncanny resemblance to the actual errors.
+The estimates bear an uncanny qualitative resemblance to the actual errors.
 Using both the jackknife and the bootstrap may be somewhat conservative,
 but if the jackknife misses an error, then the bootstrap usually catches it,
 and vice versa.
@@ -623,6 +674,19 @@ Consulting the jackknife is another (albeit noisier) possibility.
 
 
 
+\section*{Computational details}
+
+The results in this paper were obtained using the \proglang{Python} package
+\pkg{fbooja} available at \url{https://github.com/facebookresearch/fbooja}
+\dots\ \pkg{fbooja} builds upon \proglang{PyTorch} of~\citet{pytorch},
+which is available at \url{https://pytorch.org} along with instructions
+for installation of the dependencies \pkg{Matplotlib} of~\citet{matplotlib},
+\pkg{NumPy} of~\citet{numpy}, \pkg{Pillow} of~\cite{pillow},
+\pkg{Scikit-image} of~\citet{scikit-image}, and \pkg{SciPy} of~\citet{scipy}.
+
+
+
+
 \section*{Acknowledgements}
 
 We would like to thank Florian Knoll, Jerry Ma, Jitendra Malik, Matt Muckley,
@@ -637,11 +701,6 @@ Mike Rabbat, Dan Sodickson, and Larry Zitnick.
          sampling on a Cartesian grid along rays emanating from the origin}
 \label{radialines}
 \end{figure}
-
-
-
-
-\clearpage
 
 
 
@@ -838,7 +897,8 @@ Mike Rabbat, Dan Sodickson, and Larry Zitnick.
 
 \parbox{\imsizes}{\includegraphics[width=\imsizes]{../brainsout/h3_saturated}}
 \hfill
-\parbox{\imsizes}{\includegraphics[width=\imsizes]{../brainsout/h3_interpolated}}
+\parbox{\imsizes}{\includegraphics[width=\imsizes]
+       {../brainsout/h3_interpolated}}
 
 \vspace{\vertsep}
 
@@ -938,11 +998,12 @@ Mike Rabbat, Dan Sodickson, and Larry Zitnick.
 \vspace{.125in}
 
 \begin{tabular}{llll}
+\hline
     Sampling & Slice & Bootstrap & Blurred Bootstrap \\\hline
 horizontally & lower &      12.9 &              6.25 \\
 horizontally & upper &      13.8 &              7.34 \\
     radially & lower &      17.5 &              10.5 \\
-    radially & upper &      18.0 &              11.6
+    radially & upper &      18.0 &              11.6 \\\hline
 \end{tabular}
 
 \end{centering}
@@ -964,7 +1025,7 @@ for sampling retained horizontally or radially}
 \vspace{.125in}
 
 \begin{tabular}{lll}
-Std.\ Dev. & Horizontally & Radially \\\hline
+\hline Std.\ Dev. & Horizontally & Radially \\\hline
        0.0 &         12.9 &     17.5 \\
        0.5 &         9.94 &     14.6 \\
        1.0 &         6.25 &     10.5 \\
@@ -973,7 +1034,7 @@ Std.\ Dev. & Horizontally & Radially \\\hline
        2.5 &         2.04 &     5.06 \\
        3.0 &         1.33 &     4.09 \\
        3.5 &         .847 &     3.34 \\
-       4.0 &         .535 &     2.75
+       4.0 &         .535 &     2.75 \\\hline
 \end{tabular}
 
 \end{centering}
@@ -995,7 +1056,7 @@ for sampling retained horizontally or radially}
 \vspace{.125in}
 
 \begin{tabular}{lll}
-Std.\ Dev. & Horizontally & Radially \\\hline
+\hline Std.\ Dev. & Horizontally & Radially \\\hline
        0.0 &         13.8 &     18.0 \\
        0.5 &         10.9 &     15.3 \\
        1.0 &         7.34 &     11.6 \\
@@ -1004,7 +1065,7 @@ Std.\ Dev. & Horizontally & Radially \\\hline
        2.5 &         2.63 &     6.79 \\
        3.0 &         1.75 &     5.87 \\
        3.5 &         1.14 &     5.13 \\
-       4.0 &         .745 &     4.54
+       4.0 &         .745 &     4.54 \\\hline
 \end{tabular}
 
 \end{centering}
@@ -1013,12 +1074,1802 @@ Std.\ Dev. & Horizontally & Radially \\\hline
 
 
 
+%% -- Bibliography -------------------------------------------------------------
+%% - References need to be provided in a .bib BibTeX database.
+%% - All references should be made with \cite, \citet, \citep, \citealp etc.
+%%   (and never hard-coded). See the FAQ for details.
+%% - JSS-specific markup (\proglang, \pkg, \code) should be used in the .bib.
+%% - Titles in the .bib should be in title case.
+%% - DOIs should be included where available.
+
+\clearpage
+\bibliography{fbooja}
+
+
+
+
+%% -- Appendix (if any) --------------------------------------------------------
+%% - After the bibliography with page break.
+%% - With proper section titles and _not_ just "Appendix".
+
+\newpage
+
+\begin{appendix}
+
+\section{Supplementary jackknives and bootstraps}
+\label{suppfigs}
+
+This appendix supplements Figures~\ref{bigradial}--\ref{bighorizontal}
+of Section~\ref{results} with analogous figures
+for twenty cross-sectional slices through the head of the patient
+(Figures~\ref{bigradial}--\ref{bighorizontal} are for slices 3 and 10).
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 1}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 2}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 3}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 4}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 5}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 6}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 7}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 8}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 9}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 10}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 11}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 12}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 13}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 14}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 15}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 16}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 17}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 18}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 19}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20_bootstrap}}
+
+\end{centering}
+\caption{Radially retained sampling --- slice 20}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 1}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 2}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 3}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 4}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 5}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 6}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 7}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 8}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 9}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 10}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 11}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 12}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 13}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 14}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 15}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 16}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 17}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 18}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 19}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20j_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20j_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20_bootstrap}}
+
+\end{centering}
+\caption{Horizontally retained sampling --- slice 20}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r1x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 1}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r2x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 2}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r3x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 3}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r4x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 4}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r5x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 5}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r6x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 6}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r7x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 7}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r8x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 8}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r9x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 9}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r10x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 10}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r11jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r11x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 11}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r12jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r12x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 12}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r13jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r13x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 13}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r14jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r14x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 14}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r15jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r15x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 15}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r16jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r16x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 16}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r17jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r17x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 17}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r18jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r18x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 18}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r19jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r19x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 19}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/r20jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/r20x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ radially retained sampling --- slice 20}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h1x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 1}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h2x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 2}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h3x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 3}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h4x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 4}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h5x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 5}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h6x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 6}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h7x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 7}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h8x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 8}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h9x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 9}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h10jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h10x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 10}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h11jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h11x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 11}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h12jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h12x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 12}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h13jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h13x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 13}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h14jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h14x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 14}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h15jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h15x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 15}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h16jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h16x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 16}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h17jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h17x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 17}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h18jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h18x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 18}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h19jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h19x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 19}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20jx2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]
+       {../brainsout/h20jx2_jackknife}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20x2_original}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20x2_recon}}
+
+\vspace{\vertsep}
+
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20x2_error}}
+\parbox{\imsize}{\includegraphics[width=\imsize]{../brainsout/h20x2_bootstrap}}
+
+\end{centering}
+\caption{2$\times$ horizontally retained sampling --- slice 20}
+\end{figure}
+
+
+
 \clearpage
 
 
 
+\section{Blurred errors over a threshold overlaid}
+\label{blurredover}
 
-\bibliographystyle{siamplain}
-\bibliography{fbooja}
+For reference, this appendix displays the same errors over a threshold overlaid
+over the reconstruction as in Subsection~\ref{viz},
+together with the blurred errors over a threshold overlaid
+over the reconstruction (blurring with a Gaussian convolutional kernel
+whose standard deviation is one pixel, as in Subsection~\ref{sum}).
+The labeling conventions (``lower,'' ``upper,'' etc.)
+conform to those introduced in Section~\ref{results}.
+The blurred errors certainly introduce less distracting noise
+than without blurring, yet the colors still appear really distracting.
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsizes}{\includegraphics[width=\imsizes]{../brainsout/r10_overlaid}}
+\hfill
+\parbox{\imsizes}{\includegraphics[width=\imsizes]
+       {../brainsout/r10_blurred_overlaid}}
+
+\vspace{\vertsep}
+
+\parbox{\imsizes}{\includegraphics[width=\imsizes]{../brainsout/r3_overlaid}}
+\hfill
+\parbox{\imsizes}{\includegraphics[width=\imsizes]
+       {../brainsout/r3_blurred_overlaid}}
+
+\end{centering}
+\caption{Radially sampling (b)
+--- upper plots display the upper slice; lower plots show the lower}
+\end{figure}
+
+
+\begin{figure}
+\begin{centering}
+
+\parbox{\imsizes}{\includegraphics[width=\imsizes]{../brainsout/h10_overlaid}}
+\hfill
+\parbox{\imsizes}{\includegraphics[width=\imsizes]
+       {../brainsout/h10_blurred_overlaid}}
+
+\vspace{\vertsep}
+
+\parbox{\imsizes}{\includegraphics[width=\imsizes]{../brainsout/h3_overlaid}}
+\hfill
+\parbox{\imsizes}{\includegraphics[width=\imsizes]
+       {../brainsout/h3_blurred_overlaid}}
+
+\end{centering}
+\caption{Horizontally sampling (b)
+--- upper plots show the upper slice; lower plots show the lower}
+\end{figure}
+
+\end{appendix}
+\newpage
+
+
+
 
 \end{document}

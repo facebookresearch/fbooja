@@ -14,7 +14,7 @@ The functions below refer to this article as "Tao-Yang."
 
 Functions
 ---------
-zero_padded
+zero_pad
     Supplements the Fourier-domain input with zeros to fill out a full image.
 adm
     ADMM iterations for an l_2 group lasso.
@@ -44,7 +44,7 @@ import torch
 import ctorch
 
 
-def zero_padded(m, n, x, mask):
+def zero_pad(m, n, x, mask):
     """
     Supplements the Fourier-domain input with zeros to fill out a full image.
 
@@ -343,7 +343,7 @@ def cs_fft(m, n, f, mask, mu, beta, n_iter):
         assert f.shape[1] == n
         assert mask[0]
         # Rescale f and pad with zeros between the mask samples.
-        Ktf = (mu / beta) * zero_padded(m, n, f, mask)
+        Ktf = (mu / beta) * zero_pad(m, n, f, mask)
         # Calculate the Fourier transform of the convolutional kernels
         # for finite differences.
         tx = np.abs(np.fft.fft([1, -1] + [0] * (m - 2)))**2
@@ -388,7 +388,7 @@ def cs_fft(m, n, f, mask, mu, beta, n_iter):
         # Convert the mask from booleans to long integers.
         mask_nnz = torch.nonzero(mask, as_tuple=False).squeeze(1)
         # Rescale f and pad with zeros between the mask samples.
-        Ktf = zero_padded(m, n, f, mask_nnz) * (mu / beta)
+        Ktf = zero_pad(m, n, f, mask_nnz) * (mu / beta)
         # Calculate the Fourier transform of the convolutional kernels
         # for finite differences.
         tx = np.abs(np.fft.fft([1, -1] + [0] * (m - 2)))**2
@@ -560,7 +560,7 @@ def runtestadmm(method, cpu, filename, mu=1e12, beta=1, subsampling_factor=0.7,
     plt.imshow(x.reshape(m, n), cmap='gray')
     plt.subplot(223)
     plt.title('Naive (zero-padded ifft2) reconstruction')
-    plt.imshow(np.abs(zero_padded(m, n, f, mask)), cmap='gray')
+    plt.imshow(np.abs(zero_pad(m, n, f, mask)), cmap='gray')
     plt.subplot(224)
     plt.title('Sampling mask')
     plt.barh(np.arange(m), mask)

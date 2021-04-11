@@ -98,7 +98,7 @@ def jackknife2(filein, fileout, angles, low, recon, recon_args, sdn=None):
     ff_noisy = ff_orig.copy()
     ff_noisy += sdn * (np.random.randn(m, n) + 1j * np.random.randn(m, n))
     # Select which frequencies to retain.
-    mask = radialines.randradialines(m, n, angles)
+    mask = radialines.randradialineset(m, n, angles)
     # Include all low frequencies.
     for km in range(low):
         for kn in range(low):
@@ -120,7 +120,7 @@ def jackknife2(filein, fileout, angles, low, recon, recon_args, sdn=None):
         # Drop an angle.
         langles = list(angles)
         del langles[k]
-        mask1 = radialines.randradialines(m, n, langles)
+        mask1 = radialines.randradialineset(m, n, langles)
         # Include all low frequencies.
         for km in range(low):
             for kn in range(low):

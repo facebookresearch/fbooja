@@ -10,7 +10,7 @@ passing through the origin, choosing the angles of the lines at random.
 
 Functions
 ---------
-randradialines
+randradialineset
     Indicates pixels in a Cartesian grid that lie on random radial lines.
 
 This source code is licensed under the MIT license found in the LICENSE file in
@@ -25,7 +25,7 @@ import pylab as plt
 import numpy as np
 
 
-def randradialines(m, n, angles):
+def randradialineset(m, n, angles):
     """
     Indicates pixels in a Cartesian grid that lie on random radial lines.
 
@@ -99,6 +99,6 @@ if __name__ == '__main__':
             # Plot radial lines with the specified angles on an m x n Cartesian
             # grid of pixels.
             plt.subplot(1, 4, 2 * (m % 2) + n % 2 + 1)
-            plt.imshow(np.fft.fftshift(randradialines(m, n, angles)),
+            plt.imshow(np.fft.fftshift(randradialineset(m, n, angles)),
                        cmap='gray')
     plt.savefig('mask.png', bbox_inches='tight')

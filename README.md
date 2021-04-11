@@ -10,6 +10,15 @@ python jackknife2.py --help
 python admm.py --help
 python admm2.py --help
 
+Each includes a toy example for a unit test that runs when issuing the commands
+python bootstrap.py
+python bootstrap2.py
+python jackknife.py
+python jackknife2.py
+python admm.py
+python admm2.py
+python radialines.py
+
 bootstrap.py and bootstrap2.py implement the bootstrap for estimating errors in
 reconstructions from compressed sensing, the former for horizontal sampling,
 and the latter for radial sampling.
@@ -41,14 +50,14 @@ nothing more.
 
 
 brains.sh is a bash script that generates all figures in the paper available at
-http://tygert.com/juq.pdf and http://tygert.com/juqs.pdf
+http://tygert.com/jdssv.pdf
 
 brains.sh processes the scans of brains in the subdirectory "brains" and saves
 the results to a new subdirectory, "brainsout".
 
 Running brains.sh is required to process the LaTeX source in the subdirectory
-"tex"; fbooja.tex and fboojas.tex depend both on each other and on the results
-stored to the new subdirectory, "brainsout".
+"tex"; fbooja.tex depends on the results stored to the new subdirectory
+"brainsout".
 
 
 ********************************************************************************
