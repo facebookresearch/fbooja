@@ -43,9 +43,9 @@
 %% - \title{} in title case
 %% - \Plaintitle{} without LaTeX markup (if any)
 %% - \Shorttitle{} with LaTeX markup (if any), used as running title
-\title{Compressed Sensing with a Jackknife and a Bootstrap}
-\Plaintitle{Compressed Sensing with a Jackknife and a Bootstrap}
-\Shorttitle{Compressed Sensing with a Jackknife and a Bootstrap}
+\title{Compressed Sensing with a Jackknife, a~Bootstrap, and Visualization}
+\Plaintitle{Compressed Sensing with a Jackknife, a~Bootstrap, and Visualization}
+\Shorttitle{Compressed Sensing with a Jackknife, a~Bootstrap, and Visualization}
 
 %% - \Abstract{} almost as usual
 \Abstract{
@@ -241,6 +241,13 @@ from Section~\ref{results} and the appendices and is available at
 (that GitHub repository also includes a re-distribution
 of the MRI scans of a patient's head from the data
 of~\citet{mri2}, \citet{mri1}, \citet{mri3}, and~\citet{mri4}).
+The software is available with a permissive (MIT) open-source license,
+though the package is meant solely for prototyping and demonstrating
+a proof of principle --- the package may not be industrial-strength
+or suited for deployment directly to clinical practice; the software makes
+no attempt to implement fail-safes or be fool-proof,
+but rather is most appropriate for use in research or as a template
+for the development of production-ready implementations.
 
 
 
@@ -370,13 +377,16 @@ and $\bigl( f(\tilde{X}, R_j) - f(\tilde{X}, I) \bigr)_{j = 1}^k$
 from~(\ref{difference})
 span whole spaces of errors that potentially could have happened
 given the actually observed measurements.
+(Here, ``potentially'' refers to being consistent
+with what the jackknife or bootstrap can generate.)
 While the sum and average in~(\ref{jackknife}) and~(\ref{difference}),
-respectively, of these sets of differences characterize the leading modes
+respectively, of these sets of differences characterize leading modes
 of these spaces, principal component analysis can characterize all modes.
 However, looking at even just the leading modes seems somewhat overwhelming
 already; having to investigate more modes could really try the patience
 of a physician interpreting MRI scans, for instance.
-The present paper focuses on the leading modes.
+The present paper focuses on the leading modes observed in our experiments
+(namely, the sum or average).
 \end{remark}
 
 
@@ -553,9 +563,25 @@ and $\frac{m}{2}$ random integers for horizontally retained sampling
 instead of the $\frac{m + n}{5}$ random angles
 and $\frac{m}{4}$ random integers used in all other figures.
 All figures concern MRI scans of a patient's head from the data
-of~\citet{mri2}, \citet{mri1}, \citet{mri3}, and~\citet{mri4}.
+of~\citet{mri2}, \citet{mri1}, \citet{mri3},
+and~\citet{mri4}.\footnote{The \proglang{Python} software package \pkg{fbooja}
+includes a re-distribution of all data processed for the present paper,
+along with modular codes for automatically reproducing all our results,
+and is available at \url{https://github.com/facebookresearch/fbooja}\ \dots\ 
+an extended data set with MRI scans from multiple patients (one of whom
+is the patient considered in the results reported here) is available at
+\url{http://www.medinfo.cs.ucy.ac.cy/old/doc/Publications/Datasets/MRIFreeDataset.zip}}
 The resolutions in pixels of the original images range
 from $376 \times 286$ to $456 \times 371$.
+The acquisitions used turbo spin-echo pulse sequences for T2 weighting
+on a 1.5 tesla scanner; the repetition time was 4408 ms,
+the echo time was 100 ms, and the echo spacing was 10.8 ms.
+The thickness of a cross-sectional slice was 5 mm.
+The resolution was 2.226 pixels per mm.
+Discrete Fourier transforms of the downloaded full reconstructions
+yielded proxies for the measurements in the spatial Fourier domain
+(``k-space'').
+The scans did not accelerate the acquisitions via any form of parallel imaging.
 
 In the figures,
 ``Original'' displays the original image,
@@ -564,7 +590,10 @@ In the figures,
 and the reconstruction,
 ``Jackknife'' displays the jackknife $d$ from~(\ref{jackknife}),
 and ``Bootstrap'' displays the bootstrap $e$ from~(\ref{difference}).
-The values of the original pixels are normalized to range from $0$ to $1$.
+The values of the original pixels are normalized to range from $0$ to $1$
+(that is, the pixels in the original data for each cross-sectional slice
+get normalized to range from $0$ to $1$; the images corresponding
+to the same cross-sectional slice do not get further normalized individually).
 In the images ``Original'' and ``Reconstruction,''
 pure black corresponds to 0 while pure white corresponds to 1.
 In the images ``Error of Reconstruction,'' ``Jackknife,'' and ``Bootstrap,''
@@ -583,6 +612,7 @@ from Subsection~\ref{viz}.
 Figures~\ref{blurredr} and~\ref{blurredh} depict the effects
 of the blur from Subsection~\ref{sum}, implemented
 with \code{skimage.filters.gaussian}
+(a function for convolution with a Gaussian)
 from \pkg{scikit-image} of~\citet{scikit-image}.
 Table~\ref{blurring} reports how drastically
 such a nearly imperceptible blur changes
@@ -619,12 +649,42 @@ Both the jackknife and the bootstrap occasionally display artifacts
 where in fact the reconstruction was accurate.
 Moreover, they miss some anomalies;
 if the reconstruction completely washes out a feature of the original image,
-then neither the jackknife nor the bootstrap can detect the washed-out feature.
-That said, in most cases they show the actual errors nicely.
+then neither the jackknife nor the bootstrap can detect the washed-out feature
+(consider, for instance, the stark long straight line
+in the upper-right quadrants of the errors in reconstruction
+from Figures~\ref{bigradial} and~\ref{afterbigradial}
+--- the jackknife and bootstrap fail to detect that line).
+Neither the jackknife nor the bootstrap can hallucinate or otherwise introduce
+a feature in a reconstruction that the reconstruction procedure is not designed
+to handle; in particular, any machine-learned model is practically guaranteed
+to miss any feature not represented in the data set used for training
+the model. That said, in most cases they show the actual errors nicely.
 The estimates bear an uncanny qualitative resemblance to the actual errors.
 Using both the jackknife and the bootstrap may be somewhat conservative,
 but if the jackknife misses an error, then the bootstrap usually catches it,
 and vice versa.
+
+Similarly, most clinical practice involves comparison of MRI scans
+of the same patient across proton density, T1, and T2 weighting,
+and sometimes also with other weightings (FLAIR or fat-suppression,
+for example) and other physical quantities such as susceptibility, diffusion,
+or densities of radiological contrast agents.
+Comparing across these different sequence types (and possibly different
+imaging modalities) affords an additional opportunity to check
+for inconsistencies that may indicate errors in the acquisition
+or reconstruction, including errors arising from compressed sensing.
+An anonymous reviewer also suggested that careful study of the errors
+introduced by particular schemes for reconstruction (schemes such as
+the minimization of total variation tested in Section~\ref{results})
+could inform Bayesian priors useful for interpreting
+individual reconstructions in the clinical setting.
+The reviewer noted that the most prominent anomalies in the examples
+of Section~\ref{results} appear to focus on the boundary interfaces
+of different tissues, on artifacts due to motion of the cerebro-spinal fluid,
+and on idiosyncrasies in the geometry of the sampling scheme
+(radial versus horizontal).
+Clinicians will likely need to consider the reviewer's observations
+and perhaps develop suitable Bayesian priors.
 
 Broadly speaking, the bootstrap-saturated reconstructions
 and bootstrap-interpolated reconstructions look similar,
@@ -671,6 +731,18 @@ together with the reconstruction ``corrected''
 by subtracting off the bootstrap error estimates (or colorizations).
 Consulting the jackknife is another (albeit noisier) possibility.
 
+For obvious reasons, the clinical setting needs to be rather conservative
+in adopting novel techniques such as those proposed in the present paper.
+Medical research, however, might be able to more unreservedly leverage
+the proposed methods to screen for problems or otherwise quantify uncertainty
+in advanced procedures for image acquisition, reconstruction, and analysis.
+The jackknife and the bootstrap can estimate errors in any scheme
+for reconstruction from undersampled measurements, without requiring
+any modification of the software for reconstruction --- a convenience
+that could favor accelerated adoption as a handy tool in research,
+whether as inputs to a pipeline of data analysis
+or merely for flagging egregious errors.
+
 
 
 
@@ -690,7 +762,8 @@ for installation of the dependencies \pkg{Matplotlib} of~\citet{matplotlib},
 \section*{Acknowledgements}
 
 We would like to thank Florian Knoll, Jerry Ma, Jitendra Malik, Matt Muckley,
-Mike Rabbat, Dan Sodickson, and Larry Zitnick.
+Mike Rabbat, Dan Sodickson, Larry Zitnick, and the anonymous referees
+and editor.
 
 
 
@@ -753,6 +826,7 @@ Mike Rabbat, Dan Sodickson, and Larry Zitnick.
 
 \end{centering}
 \caption{Radially retained sampling --- upper slice}
+\label{afterbigradial}
 \end{figure}
 
 
