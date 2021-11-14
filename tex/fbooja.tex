@@ -177,7 +177,7 @@ may have arisen in each reconstruction from compressed sensing for MRI,
 tailored to the specific object being imaged.
 
 The jackknife is similar to standard {\it a posteriori} tests for convergence
-of numerical methods; such numerical tests for convergence
+of numerical methods; such tests for convergence
 often serve as proxies for estimates of accuracy.
 The bootstrap leverages more extensive computation, simulating measurements
 that could have been taken but were not in fact
@@ -224,6 +224,11 @@ When the root-mean-square of the denoised error estimates is large enough,
 a clinician could look at the visualizations mentioned above
 to fully understand the implications of the error estimates
 (or rescan the patient using a less error-prone sampling pattern).
+
+By reducing the time required to scan patients,
+compressed sensing promises to lower costs, improve patients' experience,
+reduce artifacts due to motion, and extend imaging to patients who have trouble
+staying still for long periods, {\it inter alia}.
 
 The structure of the remainder of the present paper is as follows:
 First, Section~\ref{methods} introduces the jackknife and the bootstrap
@@ -582,6 +587,7 @@ Discrete Fourier transforms of the downloaded full reconstructions
 yielded proxies for the measurements in the spatial Fourier domain
 (``k-space'').
 The scans did not accelerate the acquisitions via any form of parallel imaging.
+Ongoing work of others generalizes our approach to raw multi-coil data.
 
 In the figures,
 ``Original'' displays the original image,
